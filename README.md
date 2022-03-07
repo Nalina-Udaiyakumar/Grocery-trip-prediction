@@ -6,3 +6,9 @@ Other data used for prediction:
 Weather in the region of residence
 Recent restaurant spend
 Last grocery trip spend
+
+
+Files: 
+Dataprep.py - Create a dataset for modelling by merging weather data, previous grocery and restaurant spend data to Credit card transactions (CC data)
+CC_EDA.py - EDA to determine the most influential parameters and add metrics if necessary
+Grocery prediction.py - fitting a prediction model and tune
