@@ -1,5 +1,5 @@
 # Grocery-trip-prediction
-Based on cresit card transactions and other data, predict the date of your next grocery shopping trip
+Based on credit card transactions and other data, predict the date of your next grocery shopping trip
 
 
 Other data used for prediction:
