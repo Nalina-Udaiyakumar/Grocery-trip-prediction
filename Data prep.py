@@ -12,6 +12,8 @@ print(os.getcwd())
 
 # Import the categorized CCS data
 CCdata = pd.read_csv("--path to categorized credit card transactions data",header=0, index_col=False)
+# remove duplicate rows if any
+CCdata.remove_duplicates(subset=None, keep='first', inplace=True)
 print(CCdata.shape)
 
 # Import weather data
