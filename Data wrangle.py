@@ -9,13 +9,22 @@ CCdata['Amount'] = pd.to_numeric(CCdata['Amount'])
 # filter rows with category groceries, shopping walmart and store walmart
 # extract the date and amount as series from the above  filtered df 
 # offset the value by 1 row join with the CC merged data to get the previous grocery trip date and amount
-groceryData = CCdata.loc[CCdata['Category'].isin(["Groceries","Shopping-Walmart"])]
-# groceryData = groceryData.drop(['Transaction Date','Posting Date','Description','Category'],axis=1)
+
+CCdata_merged['Description'] = CCdata_merged['Description'].str.lower()
+CCdata_merged['Grocery Flag'] = 0
+CCdata_merged.loc[CCdata_merged['Category'].isin(["Groceries","Shopping-Walmart"]),'Grocery Flag'] = 1
+CCdata_merged.loc[CCdata_merged['Description'].str.contains(r'wal(?=[\*\-mart]+)',regex=True),'Grocery Flag'] = 1
+
+groceryData = CCdata_merged[CCdata_merged['Grocery Flag']==1]
+groceryData = groceryData[['Amount','Grocery Flag']]
+groceryData['Amount'] = pd.to_numeric(groceryData['Amount'])
 # Treating duplicates - it's possible to go to multiple grocery stores in a day
 print(groceryData.shape)
 print(len(pd.unique(groceryData.index)))  # Unique dates in groceryData < no. of rows in groceryData
-# Groupby date to create unique values of date and grocery spend - for each date, find sum of grocery spend.
-groceryData = groceryData.groupby(['Date']).Amount.sum().reset_index()
+# Groupby date to create unique values of date and grocery spend - for each date, find sum of grocery spend and grocery flag
+# (to flag multiple grocery store visits in a day).
+groceryData = groceryData.groupby(['Date']).sum().reset_index()
+               
 # Create month, year and day columns in groceryData and set Date as index
 groceryData['Month'] = groceryData['Date'].dt.strftime("%b")
 groceryData['Year'] = groceryData['Date'].dt.year.astype(int)
@@ -49,8 +58,10 @@ grocery_temp['Year'] = grocery_temp['Year'].fillna(grocery_temp['Date'].dt.year)
 grocery_temp['Month'] = grocery_temp['Month'].fillna(grocery_temp['Date'].dt.strftime("%b"))
 grocery_temp['Day'] = grocery_temp['Day'].fillna(grocery_temp['Date'].dt.day).astype(int)
 grocery_temp['Amount'] = grocery_temp['Amount'].fillna(0.0)
+grocery_temp['Grocery Flag'] = grocery_temp['Grocery Flag'].fillna(0).astype(int)
 
-grocery_temp = grocery_temp.rename({'Amount':'PrevGroceryAmount'}, axis=1)
+grocery_temp = grocery_temp.rename({'Amount':'PrevGroceryAmount',
+                                   'Grocery Flag':'PrevGroceryFlag'}, axis=1)
 
 grocery_temp = grocery_temp.set_index('Date')
 print(grocery_temp.head(10))                                                       
@@ -63,9 +74,9 @@ print(grocery_temp.head(10))
 ## Join prev grocery amount and prev grocery date onto CC data_merged
 grocery_temp = grocery_temp.drop(['Month','Year','Day'],axis=1)
 print(CCdata_merged.shape)
-print(CCdata_merged.head(5))
+print(CCdata_merged.columns)
 print(grocery_temp.shape)
-print(grocery_temp.head(5))
+print(grocery_temp.columns)
 
 CCdata_merged = CCdata_merged.join(grocery_temp, how='left')
 # dropping duplicates in CCdata_merged
@@ -73,23 +84,27 @@ CCdata_merged.drop_duplicates(subset=None,keep='first',inplace=True)
 
 print(CCdata_merged.shape)
 print(CCdata_merged.columns)
-print(CCdata_merged['PrevGroceryAmount'].count())
-print(CCdata_merged['PrevGroceryDate'].count())
 
 # getting value counts of year, month and date
-print(CCdata_merged.groupby('Year')['Month'].value_counts())
-print(CCdata_merged['Day'].value_counts().sort_index(ascending=True))
+print(CCdata_merged.groupby('Year')['Month'].unique())
+print(CCdata_merged['Day'].unique())
+print(CCdata_merged['Grocery Flag'].unique())
 
 ## c. Number of days since you last ordered from a restaurant and d. The amount of last restaurant order 
 # Filter rows of restaurant transactions 
-restaurantData = CCdata.loc[CCdata['Category'].isin(["Restaurant","Food - Take out"])]
-restaurantData = restaurantData.drop(['Transaction Date','Posting Date','Description','Category'],axis=1)
+
+CCdata_merged['Restaurant Flag']=0
+CCdata_merged.loc[CCdata_merged['Category'].isin(["Restaurant","Food - Take out"]), 'Restaurant Flag'] = 1
+restaurantData = CCdata_merged[CCdata_merged['Restaurant Flag']==1]
+
+restaurantData = restaurantData[['Amount','Restaurant Flag']]
+restaurantData['Amount'] = pd.to_numeric(restaurantData['Amount'])
 print(restaurantData.shape)
 print(restaurantData.head(10))
 print(len(pd.unique(restaurantData.index))) ## If unique length of index < no. of rows of restaurantData, groupby date and sum of restaurant spend
 # Unique dates in restaurantData < no. of rows in restaurantData
-# Groupby date to create unique values of date and restaurant spend - for each date, find sum of restaurant spend.
-restaurantData = restaurantData.groupby(['Date']).Amount.sum().reset_index()
+# Groupby date to create unique values of date and restaurant spend - for each date, find sum of restaurant spend,res flag
+restaurantData = restaurantData.groupby(['Date']).sum().reset_index()
 # Create month, year and day columns in restaurantData and set Date as index
 restaurantData['Month'] = restaurantData['Date'].dt.strftime("%b")
 restaurantData['Year'] = restaurantData['Date'].dt.year.astype(int)
@@ -119,8 +134,10 @@ restaurant_temp['Year'] = restaurant_temp['Year'].fillna(restaurant_temp['Date']
 restaurant_temp['Month'] = restaurant_temp['Month'].fillna(restaurant_temp['Date'].dt.strftime("%b"))
 restaurant_temp['Day'] = restaurant_temp['Day'].fillna(restaurant_temp['Date'].dt.day).astype(int)
 restaurant_temp['Amount'] = restaurant_temp['Amount'].fillna(0.0)
+restaurant_temp['Restaurant Flag'] = restaurant_temp['Restaurant Flag'].fillna(0).astype(int)
 
-restaurant_temp = restaurant_temp.rename({'Amount':'PrevRestaurantAmount'}, axis=1)
+restaurant_temp = restaurant_temp.rename({'Amount':'PrevRestaurantAmount',
+                                         'Restaurant Flag':'PrevRestaurantFlag'}, axis=1)
 
 restaurant_temp = restaurant_temp.set_index('Date')
 print(restaurant_temp.head(10))                                                       
@@ -141,5 +158,4 @@ CCdata_merged.drop_duplicates(subset=None,keep='first',inplace=True)
 
 print(CCdata_merged.shape)
 print(CCdata_merged.columns)
-print(CCdata_merged['PrevRestaurantAmount'].count())
-print(CCdata_merged['PrevRestaurantDate'].count())
+print(CCdata_merged['Restaurant Flag'].unique())
