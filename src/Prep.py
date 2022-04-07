@@ -4,11 +4,16 @@
 import os
 import pandas as pd
 import numpy as np
+import seaborn as sns
 from datetime import datetime
+import matplotlib.pyplot as plt
 
 # Set working directory
 os.chdir("---Your working directory path")
 print(os.getcwd())
+
+# Set theme for sns plots
+sns.set_theme(style="darkgrid")
 
 # Import the categorized CCS data
 CCdata = pd.read_csv("--path to categorized credit card transactions data",header=0, index_col=False)
@@ -35,7 +40,7 @@ print(weatherData.shape)
 print(weatherData.head(20))
 print(weatherData.columns)
 print(weatherData.dtypes)
-## Wow! the data is mostly clean :-)
+## Wow! the data is mostly clean :-). fill Nans with previous non-Nan vlues so its convenient while fitting model
 
 # Set the date column in weather data as a datetime object and then as index of df
 weatherData['Date'] = pd.to_datetime(weatherData['Date/Time'], format="%Y-%m-%d")
@@ -56,6 +61,12 @@ weatherData = weatherData.rename({'Max Temp (°C)':'Max Temp',
                                   'Spd of Max Gust (km/h)':'Max Gust'}, axis=1)
 
 weatherData['Temp Diff'] = weatherData['Max Temp'] - weatherData['Min Temp']
+
+# Fill Nans with the previous non-Nan value in the following columns - coz they are to be used in regression modelling
+print("The percentage of null values in each column: \n",weatherData[['MaxGust','MeanTemp','TempDiff']].isnull().mean()*100)
+weatherData['MaxGust'] = weatherData['MaxGust'].fillna(method="ffill")
+weatherData['MeanTemp'] = weatherData['MeanTemp'].fillna(method="ffill")
+weatherData['TempDiff'] = weatherData['TempDiff'].fillna(method="ffill")
 
 statCols = ['Total Precip','Total Rain','Total Snow','Snow Grnd',
             'Max Gust','Max Temp','Min Temp','Temp Diff','Mean Temp']
@@ -81,15 +92,25 @@ print(CCdata['Date'].head(10))
 
 # Setting the date column to type datatime64 and as index of the df
 CCdata['Date'] = pd.to_datetime(CCdata['Date'], format="%d-%b-%Y")
+CCdata['Weekday'] = CCdata['Date'].dt.day_name()
 print(CCdata.dtypes)
 CCdata = CCdata.set_index('Date')
 CCdata.head(5)
+
+# Sorting CC data by date before proceeding
+CCdata = CCdata.sort_index()
 
 # Joining weather data with the CC data based on date
 requiredCols = ['Total Precip','Total Rain','Total Snow','Snow Grnd',
             'Max Gust','Max Temp','Min Temp','Temp Diff','Mean Temp']
 requiredWeatherData = weatherData[requiredCols]
 print(requiredWeatherData.columns)
+
+# Change amount to float datatype and remove , if any, in the amount value
+print(CCdata['Amount'].dtype)
+CCdata['Amount'] = CCdata['Amount'].str.replace('\,','',regex=True) # removing all , in the amount values
+CCdata['Amount'] = pd.to_numeric(CCdata['Amount'])
+print(CCdata['Amount'].dtype)
 
 CCdata_merged = CCdata.join(requiredWeatherData, how='left')  
 ##pd.merge doesn't work here bcoz date is not an explicit column here, its the index of these 2 dataframes
