@@ -15,7 +15,7 @@ CCdata_merged['Grocery Flag'] = 0
 CCdata_merged.loc[CCdata_merged['Category'].isin(["Groceries","Shopping-Walmart"]),'Grocery Flag'] = 1
 CCdata_merged.loc[CCdata_merged['Description'].str.contains(r'wal(?=[\*\-mart]+)',regex=True),'Grocery Flag'] = 1
 
-groceryData = CCdata_merged[CCdata_merged['Grocery Flag']==1]
+groceryData = CCdata_merged[(CCdata_merged['Grocery Flag']==1) & (CCdata_merged['Amount']>0)]
 groceryData = groceryData[['Amount','Grocery Flag']]
 groceryData['Amount'] = pd.to_numeric(groceryData['Amount'])
 # Treating duplicates - it's possible to go to multiple grocery stores in a day
@@ -34,7 +34,6 @@ groceryData = groceryData.set_index('Date')
 print(groceryData.shape)
 print(groceryData.dtypes)
 print(groceryData.head(10))
-
 
 # Creating the columns for last grocery trip date and amount
 grocery_temp = pd.DataFrame()
