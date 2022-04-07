@@ -49,18 +49,18 @@ print(weatherData.dtypes)
 weatherData = weatherData.set_index('Date')
 weatherData.head(5)
 
-weatherData = weatherData.rename({'Max Temp (°C)':'Max Temp', 
-                                  'Min Temp (°C)':'Min Temp',
-                                  'Mean Temp (°C)':'Mean Temp',
-                                 'Heat Deg Days (°C)':'Heat Deg Days',
-                                 'Cool Deg Days (°C)':'Cool Deg Days',
-                                 'Total Precip (mm)':'Total Precip',
-                                  'Total Rain (mm)':'Total Rain',
-                                  'Total Snow (cm)':'Total Snow',
-                                  'Snow on Grnd (cm)':'Snow Grnd',
-                                  'Spd of Max Gust (km/h)':'Max Gust'}, axis=1)
+weatherData = weatherData.rename({'Max Temp (°C)':'MaxTemp', 
+                                  'Min Temp (°C)':'MinTemp',
+                                  'Mean Temp (°C)':'MeanTemp',
+                                 'Heat Deg Days (°C)':'HeatDegDays',
+                                 'Cool Deg Days (°C)':'CoolDegDays',
+                                 'Total Precip (mm)':'TotalPrecip',
+                                  'Total Rain (mm)':'TotalRain',
+                                  'Total Snow (cm)':'TotalSnow',
+                                  'Snow on Grnd (cm)':'SnowGrnd',
+                                  'Spd of Max Gust (km/h)':'MaxGust'}, axis=1)
 
-weatherData['Temp Diff'] = weatherData['Max Temp'] - weatherData['Min Temp']
+weatherData['TempDiff'] = weatherData['MaxTemp'] - weatherData['MinTemp']
 
 # Fill Nans with the previous non-Nan value in the following columns - coz they are to be used in regression modelling
 print("The percentage of null values in each column: \n",weatherData[['MaxGust','MeanTemp','TempDiff']].isnull().mean()*100)
@@ -68,8 +68,8 @@ weatherData['MaxGust'] = weatherData['MaxGust'].fillna(method="ffill")
 weatherData['MeanTemp'] = weatherData['MeanTemp'].fillna(method="ffill")
 weatherData['TempDiff'] = weatherData['TempDiff'].fillna(method="ffill")
 
-statCols = ['Total Precip','Total Rain','Total Snow','Snow Grnd',
-            'Max Gust','Max Temp','Min Temp','Temp Diff','Mean Temp']
+statCols = ['TotalPrecip','TotalRain','TotalSnow','SnowGrnd',
+            'MaxGust','MaxTemp','MinTemp','TempDiff','MeanTemp']
 print(weatherData[statCols].describe())
 
 ## Clean the date column in the CC data and set it to datetime format
@@ -101,8 +101,8 @@ CCdata.head(5)
 CCdata = CCdata.sort_index()
 
 # Joining weather data with the CC data based on date
-requiredCols = ['Total Precip','Total Rain','Total Snow','Snow Grnd',
-            'Max Gust','Max Temp','Min Temp','Temp Diff','Mean Temp']
+requiredCols = ['TotalPrecip','TotalRain','TotalSnow','SnowGrnd',
+            'MaxGust','MaxTemp','MinTemp','TempDiff','MeanTemp']
 requiredWeatherData = weatherData[requiredCols]
 print(requiredWeatherData.columns)
 
