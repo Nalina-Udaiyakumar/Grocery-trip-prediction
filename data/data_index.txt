@@ -1,1 +1,6 @@
+CCdata_merged.csv - categorised credit card transaction data with weather data merged
+CompleteCCStatements_RBCTang.csv - categorized credit card transaction data
 
+en_climate_daily_ON_6153193_2020_P1D.csv - daily weather data for 2020
+en_climate_daily_ON_6153193_2021_P1D.csv - daily weather data for 2021
+en_climate_daily_ON_6153193_2022_P1D.csv - daily weather data for 2022
