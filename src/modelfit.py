@@ -30,8 +30,16 @@ model = sm.OLS(y, X)
 results = model.fit()
 print(results.summary())  ## gives all details of the model, required to evaluate and compare models
 print('coefficient of determination:', results.rsquared)
-print('adjusted coefficient of determination:', results.rsquared_adj)
+print('adjusted coefficient of determination:', results.rsquared_adj) # adjusted R2 for this model is around 57%(varies with training sample)
 print('regression coefficients:', results.params)
+#plotting predictions
+test_pred = results.predict(testdata[['MaxGust', 'MeanTemp', 'GroceryDiff']])
+testdata['PredictedOLS'] = test_pred
+sns.lineplot(x='Date',y='Actual',data=testdata, color='darkgrey')
+sns.lineplot(x='Date',y='PredictedOLS', data=testdata, color='red')
+plt.title('Actual vs predicted values - OLS regression')
+plt.legend(labels=['Actual','Predicted'])
+plt.savefig("Actual vs predicted values - OLS regression.png")
 
 
 ## fitting SVR model to compare wiht OLS model
@@ -39,5 +47,10 @@ regressor = SVR(kernel='rbf') # choosing rbf/gaussian kernel coz the relationshi
 regressor.fit(X,y)
 
 #print the predicted values
-svm_pred = regressor.predict(testdata[['MaxGust', 'MeanTemp', 'GroceryDiff']])
-print(svm_pred)
+testdata['PredictedSVM'] = regressor.predict(testdata[['MaxGust', 'MeanTemp', 'GroceryDiff']])
+sns.lineplot(x='Date',y='Actual',data=testdata, color='darkgrey')
+sns.lineplot(x='Date',y='PredictedOLS', data=testdata, color='red')
+plt.title('Actual vs predicted values - SVM')
+plt.legend(labels=['Actual','Predicted'])
+plt.savefig("Actual vs predicted values - SVM.png")
+# SVR model is better than the OLS regression model
