@@ -40,7 +40,7 @@ sns.lineplot(x='Date',y='PredictedOLS', data=testdata, color='red')
 plt.title('Actual vs predicted values - OLS regression')
 plt.legend(labels=['Actual','Predicted'])
 plt.savefig("Actual vs predicted values - OLS regression.png")
-
+# We can see that the OLS model doesn't predict the pattern very well. We could refit the OLS model on box-cox transformed training data
 
 ## fitting SVR model to compare wiht OLS model
 regressor = SVR(kernel='rbf') # choosing rbf/gaussian kernel coz the relationship of regressors is not linear
