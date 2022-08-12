@@ -13,9 +13,9 @@ traindata = traindata[['Grocery Amount', 'MaxGust',
                                  'MeanTemp',
                                  'GroceryDiff']]  ## choosing only the 3 factors that have higher correlation
 
-sample80 = np.random.rand(len(traindata)) <= 0.8 
-testdata = traindata[~sample80]
-traindata = traindata[sample80]
+sample80 = int(len(traindata)*0.8)
+testdata = df[sample80:]
+traindata = df[:sample80]
 
 print(f"No. of training examples: {traindata.shape[0]}")
 print(f"No. of testing examples: {testdata.shape[0]}")
