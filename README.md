@@ -18,6 +18,9 @@ Last grocery trip spend
 
 Files: 
 Prep.py - Create a dataset for modelling by merging weather data with credit card transactions data (CC data)
+
 Wrangle.py - Create columns for previous grocery and restaurant spend data in CC data
+
 EDA.py - EDA to determine the most influential parameters, outlier and null value correction and add metrics if necessary
-modelfit.py - fitting a prediction model - regression and SVM
+
+modelfit.py - fitting a prediction model - linear regression, SVM, random forest, lightGBM
