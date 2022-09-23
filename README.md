@@ -4,7 +4,7 @@
 
 Based on credit card transactions, store directory(sourced from the web), weather and other data, predict the date of your next grocery shopping trip
 
-<h6>Kernel:</h6> Python3
+<h6>Kernel:</h6> Python3 and R
 
 <h6>Logs:</h6> Absent
 
