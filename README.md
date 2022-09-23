@@ -7,7 +7,7 @@ Logs: Absent
 
 License: MIT
 
-Purpose: Reading credit card statements from a particular bank, that are in PDF format and analysing transactions to present spending pattern.
+Purpose: Reading credit card statements from a particular bank, that are in PDF format and wrangling transactions data to analyze spending pattern and make predictions for future spends - particularly for grocery shopping.
 
 Python libraries used: os, pandas, numpy, datetime, matplotlib, seaborn, sklearn, statsmodels
 
@@ -24,3 +24,6 @@ Wrangle.py - Create columns for previous grocery and restaurant spend data in CC
 EDA.py - EDA to determine the most influential parameters, outlier and null value correction and add metrics if necessary
 
 modelfit.py - fitting a prediction model - linear regression, SVM, random forest, lightGBM
+
+
+Overview
